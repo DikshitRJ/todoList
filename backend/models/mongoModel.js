@@ -22,6 +22,6 @@ const schema=new mongoose.Schema({
         type:Array,
         required:true
     }
-},({collection:accounts}))
+},({collection:'accounts'}))
 const model=new mongoose.model(schema,"accountsModel")
 module.exports=model
