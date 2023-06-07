@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+    <head>
+        <title>
+            Hello
+        </title>
+        <script>
+            const ws=new WebSocket(`ws://${location.host}`)
+            
+            ws.onopen=(event)=>{
+                document.write('Connected through websocket')
+                ws.onmessage=({data})=>{
+                    var text=document.createElement("p")
+                    text.innerHTML=data
+                    document.body.appendChild(text)
+        }
+        ws.send('hello world, it is the client here');
+            }
+            
+        </script>
+    </head>
+
+</html>
