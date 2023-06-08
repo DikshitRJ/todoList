@@ -1,7 +1,7 @@
 const mongo=require('mongodb')
 const mongoose=require('mongoose')
 const express=require('express')
-const schema=new mongoose.Schema({
+const mongoSchema=new mongoose.Schema({
     name:{
         type:String,
         required:[true,"name not entered"]
@@ -17,11 +17,11 @@ const schema=new mongoose.Schema({
     pswd:{
         type:String,
         required:[true,"password not entered"]
-    },
-    taskArray:{
+    }
+    /*taskArray:{
         type:Array,
         required:true
-    }
-},({collection:'accounts'}))
-const model=new mongoose.model(schema,"accountsModel")
+    }*/
+},({collection:"accounts"}))
+const model=new mongoose.model("accountsModel",mongoSchema)
 module.exports=model
