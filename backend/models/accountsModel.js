@@ -17,11 +17,11 @@ const mongoSchema=new mongoose.Schema({
     pswd:{
         type:String,
         required:[true,"password not entered"]
-    }
-    /*taskArray:{
+    },
+    taskArray:{
         type:Array,
         required:true
-    }*/
+    }
 },({collection:"accounts"}))
 const model=new mongoose.model("accountsModel",mongoSchema)
 module.exports=model
