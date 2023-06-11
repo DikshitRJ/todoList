@@ -20,7 +20,11 @@ const mongoSchema=new mongoose.Schema({
     },
     taskArray:{
         type:Array,
-        required:true
+        default:[null]
+    },
+    nextTask:{
+        type:Number,
+        default:1
     }
 },({collection:"accounts"}))
 const model=new mongoose.model("accountsModel",mongoSchema)
