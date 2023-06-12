@@ -1,5 +1,8 @@
 const router=require('express').Router();
 const mongoose = require('mongoose');
+require('dotenv').config();
+const passport=require('passport');
+const passport_init=require('../models/passport-config');
 const {MongoClient,ObjectID}=require('mongodb');
 const mongodb = new MongoClient("mongodb://localhost:27017/");
 const bodyparser=require('body-parser');
@@ -8,6 +11,8 @@ const unverifiedModel=require('../models/unverifiedModel');
 const nodemailer=require('nodemailer');
 const mailer=require('./mailer');
 const URLSearchParams=require('url-search-params');
+const express_flash=require('express-flash');
+const express_session=require('express-session');
 async function connect_mongo() {
     await mongoose.connect('mongodb://localhost:27017/todoList');
 }
@@ -17,9 +22,26 @@ router.use((req, res, next) => {
     req.params = Object.fromEntries(queryParams);
     next();
   });
+  function isNotAuthenticated(req,res,next){
+    if (!req.isAuthenticated()){return next()}else{res.redirect('/get')}}
+router.use(express_flash());
+router.use(express_session({
+    secret:process.env.SESSION_SECRET,
+    resave:false,
+    saveUninitialized:false
+}))
+router.use(passport.initialize());
+router.use(passport.session());
 router.use(bodyparser.json());
 router.use(bodyparser.urlencoded({extended: true}));
-router.post('/new',async(req, res)=>{
+router.use(passport_init,async(emailid)=>{
+    const accounts = mongodb.db('todoList').collection('accounts');
+    const doc=await accounts.findOne({email:emailid});
+},async(acid)=>{
+    const accounts = mongodb.db('todoList').collection('accounts');
+    const doc=await accounts.findOne({id:acid});
+})
+router.post('/new',isNotAuthenticated,async(req, res)=>{
     res.send('Click the link in the email');
     const unverified = mongodb.db('todoList').collection('unverified');
     console.log(JSON.stringify(req.body));
@@ -36,7 +58,12 @@ router.post('/new',async(req, res)=>{
     });
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 });
-router.get('/verify', async(req, res) => {
+router.get('/get',(req,res,next)=>{
+    if (req.isAuthenticated()){return next()}else{res.redirect('/login')}},(req,res)=>{
+    res.send(req.user.name);
+})
+router.post('/login',isNotAuthenticated,passport.authenticate('local',{successRedirect:'/',failiureRedirect:'/login',failiureFlash:true}));
+router.get('/verify', isNotAuthenticated,async(req, res) => {
     try{
         const unverified = mongodb.db('todoList').collection('unverified');
         const doc=await unverified.findOne({id:req.params.id});
